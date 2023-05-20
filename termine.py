@@ -2,7 +2,11 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Generator
+import base64
+import os
+import pickle
 import sys
 
 from bs4 import BeautifulSoup
@@ -58,8 +62,21 @@ def main() -> int:
                         type=lambda s: datetime.strptime(s, "%Y-%m-%d %H:%M"))
     args = parser.parse_args()
 
+    cache_dir = Path(os.getenv("XDG_CACHE_DIR") or Path(Path.home(), ".cache"), "termin.bremen.de")
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_file = Path(cache_dir, str(base64.urlsafe_b64encode(bytes(args.url, "utf-8")), "utf-8"))
+
     soup = get_soup(args.url)
     appointments = set(parse_appointments(soup))
+
+    try:
+        with open(cache_file, "rb") as f:
+            cached_appointments = pickle.load(f)
+    except FileNotFoundError:
+        cached_appointments = set()
+    with open(cache_file, "wb") as f:
+        pickle.dump(appointments | cached_appointments, f)
+    appointments = appointments - cached_appointments
 
     ret = 1
     for appointment in sorted(appointments):
