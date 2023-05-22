@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Generator
-import base64
+import hashlib
 import os
 import pickle
 import sys
@@ -74,7 +74,7 @@ def main() -> int:
 
     cache_dir = Path(os.getenv("XDG_CACHE_DIR") or Path(Path.home(), ".cache"), "termin.bremen.de")
     cache_dir.mkdir(parents=True, exist_ok=True)
-    cache_file = Path(cache_dir, str(base64.urlsafe_b64encode(bytes(args.url, "utf-8")), "utf-8"))
+    cache_file = Path(cache_dir, hashlib.sha256(bytes(args.url, "utf-8")).hexdigest())
 
     soup = get_soup(args.url)
     appointments = set(parse_appointments(soup))
