@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Generator
+from zoneinfo import ZoneInfo
 import hashlib
 import os
 import pickle
@@ -61,7 +62,7 @@ def parse_appointments(soup) -> Generator[Appointment, None, None]:
         form = button.parent
         date = form.find("input", {"name": "date"})["value"]
         time = button["title"]
-        date = datetime.strptime(f"{date}{time}", "%Y%m%d%H:%M")
+        date = datetime.strptime(f"{date}{time}", "%Y%m%d%H:%M").replace(tzinfo=ZoneInfo("Europe/Berlin"))
         yield Appointment(date=date)
 
 
