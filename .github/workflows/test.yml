@@ -1,6 +1,10 @@
 name: Test
 
-on: [push]
+on:
+  # > [...] scheduled workflows are automatically disabled when no repository activity has occurred in 60 days.
+  schedule:
+    # Täglich um 9:30 UTC
+    - cron: '30 9 * * *'
 
 jobs:
   build:
