@@ -19,5 +19,5 @@ def test_termine():
     # Ich weiß nicht in welchen Fällen es keine Termine gibt.
     assert len(appointments) > 0
     # Ich vertraue nicht darauf, dass Termine sofort gelöscht werden und unsere Uhren gleich genug gehen.
-    yesterday = datetime.now(tz=ZoneInfo("Europe/Berlin")) - timedelta(hours=24)
+    yesterday = datetime.now() - timedelta(hours=24)
     assert appointments[0].date >= yesterday
