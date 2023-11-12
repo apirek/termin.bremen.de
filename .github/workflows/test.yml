@@ -6,6 +6,8 @@ on:
   schedule:
     # Täglich um 9:30 UTC
     - cron: '30 9 * * *'
+  # Erlaubt manuelles Ausführen.
+  workflow_dispatch:
 
 jobs:
   build:
