@@ -73,23 +73,25 @@ def main() -> int:
     parser.add_argument("url", metavar="URL", help="Terminvergabe-URL")
     parser.add_argument("date", metavar="DATE", help="Zeige nur Termine vor diesem (%%Y-%%m-%%d %%H:%%M)",
                         type=lambda s: datetime.strptime(s, "%Y-%m-%d %H:%M"))
+    parser.add_argument("-c", action="store_true", help="Zeige nur neue Termine seit dem letzten Aufruf",
+                        dest="cache")
     args = parser.parse_args()
-
-    cache_dir = Path(os.getenv("XDG_CACHE_DIR") or Path(Path.home(), ".cache"), "termin.bremen.de")
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    cache_file = Path(cache_dir, hashlib.sha256(bytes(args.url, "utf-8")).hexdigest())
 
     soup = get_soup(args.url)
     appointments = set(parse_appointments(soup))
 
-    try:
-        with open(cache_file, "rb") as f:
-            cached_appointments = pickle.load(f)
-    except FileNotFoundError:
-        cached_appointments = set()
-    with open(cache_file, "wb") as f:
-        pickle.dump(appointments | cached_appointments, f)
-    appointments = appointments - cached_appointments
+    if args.cache:
+        cache_dir = Path(os.getenv("XDG_CACHE_DIR") or Path(Path.home(), ".cache"), "termin.bremen.de")
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        cache_file = Path(cache_dir, hashlib.sha256(bytes(args.url, "utf-8")).hexdigest())
+        try:
+            with open(cache_file, "rb") as f:
+                cached_appointments = pickle.load(f)
+        except FileNotFoundError:
+            cached_appointments = set()
+        with open(cache_file, "wb") as f:
+            pickle.dump(appointments, f)
+        appointments = appointments - cached_appointments
 
     ret = 1
     for appointment in sorted(appointments):
