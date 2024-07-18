@@ -25,4 +25,8 @@ jobs:
         pip install -r requirements.txt
     - name: Test with pytest
       run: |
-        pytest
+        pytest --basetemp=out
+    - uses: actions/upload-artifact@v4
+      with:
+        name: out
+        path: out/
