@@ -54,6 +54,9 @@ def get_soup(url) -> BeautifulSoup:
 
 
 def parse_appointments(soup) -> Generator[Appointment, None, None]:
+    if elem := soup.find("h1", class_="error"):
+        # elem.next_sibling ist \n, p kommt danach.
+        raise RuntimeError(elem.next_sibling.next_sibling)
     for button in soup.find_all("button"):
         # Freie Termine haben button und form, belegte Termine haben disabled button und kein form.
         if button.disabled or button.parent.name != "form":
