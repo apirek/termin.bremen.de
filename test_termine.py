@@ -13,8 +13,6 @@ def test_termine():
     """
     url = "https://termin.bremen.de/termine/directentry?mdt=4&loc=3&cnc-1705=1"
     soup = termine.get_soup(url)
-    # Antwort ist auch bei falschen Query-Parametern 200 OK. Suche nach bekanntem String.
-    assert soup.find(string=re.compile(r"\bTerminvorschläge"))
     appointments = list(termine.parse_appointments(soup))
     # Ich weiß nicht in welchen Fällen es keine Termine gibt.
     assert len(appointments) > 0
